@@ -1,19 +1,18 @@
 const express = require("express");
-const pool = require("./db"); // Mengimpor pool yang sudah diinisialisasi dengan mysql2/promise
-const verifyToken = require("./auth"); // Import middleware
+const app = express();
+const pool = require("./db");
+const verifyToken = require("./auth"); // middleware token
 
 const PORT = process.env.PORT || 3000;
 
-const app = express();
-
 app.use(express.json());
 
-// Tambahkan route GET / untuk tes jika dibuka dari browser
+// Tes koneksi root
 app.get("/", (req, res) => {
   res.send("API Backend Kost is Running 🚆");
 });
 
-// Semua route di bawah ini pakai verifikasi token
+// Endpoint tambah kost
 app.post("/kost", verifyToken, async (req, res) => {
   try {
     const {
@@ -30,7 +29,6 @@ app.post("/kost", verifyToken, async (req, res) => {
       return res.status(400).json({ message: "Field wajib belum lengkap" });
     }
 
-    // Menggunakan query melalui pool (pastikan pool.query benar digunakan)
     const [result] = await pool.query(
       `INSERT INTO kost (nama_ruangan, deskripsi, fasilitas, harga, ukuran_kamar, tipe, gambar)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
@@ -50,11 +48,10 @@ app.post("/kost", verifyToken, async (req, res) => {
       id: result.insertId,
     });
   } catch (error) {
-    console.error("Database Error:", error);
-    res.status(500).json({
-      message: "Gagal menambahkan kost",
-      error: error.message || error,
-    });
+    console.error("ERROR:", error);
+    res
+      .status(500)
+      .json({ message: "Gagal menambahkan kost", error: error.message });
   }
 });
 
