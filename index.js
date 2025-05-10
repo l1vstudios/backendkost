@@ -2,9 +2,16 @@ const express = require("express");
 const app = express();
 const pool = require("./db");
 const verifyToken = require("./auth"); // import middleware
-const PORT = 3000;
+
+// Gunakan PORT dari environment Railway, fallback ke 3000 untuk lokal
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
+// Tambahkan route GET / untuk tes jika dibuka dari browser
+app.get("/", (req, res) => {
+  res.send("API Backend Kost is Running 🚆");
+});
 
 // Semua route di bawah ini pakai verifikasi token
 app.post("/kost", verifyToken, async (req, res) => {
@@ -48,5 +55,5 @@ app.post("/kost", verifyToken, async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
