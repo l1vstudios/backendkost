@@ -1,11 +1,14 @@
-const mysql = require("mysql2/promise");
+const { createPool } = require("mysql2/promise");
+require("dotenv").config();
 
-const pool = mysql.createPool({
-  host: process.env.MYSQL_HOST, // Gunakan host yang benar
-  user: process.env.MYSQL_USER, // User: root
-  password: process.env.MYSQL_PASSWORD, // Password sesuai dengan Railway
-  database: process.env.MYSQL_DATABASE, // Database: manajemenkost
-  port: process.env.MYSQL_PORT || 30166, // Port: 30166 sesuai dengan Railway
+const db = createPool({
+  host: process.env.DB_Host,
+  port: process.env.DB_Port,
+  user: process.env.DB_User,
+  password: process.env.DB_Pass,
+  database: process.env.DB_Data,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
-
-module.exports = pool;
+module.exports = db;
