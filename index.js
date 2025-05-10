@@ -49,8 +49,11 @@ app.post("/kost", verifyToken, async (req, res) => {
       id: result.insertId,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Gagal menambahkan kost" });
+    console.error("Database Error:", error); // Menampilkan error yang lebih rinci ke log
+    res.status(500).json({
+      message: "Gagal menambahkan kost",
+      error: error.message || error, // Mengirimkan pesan error yang lebih rinci
+    });
   }
 });
 
