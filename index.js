@@ -1,13 +1,12 @@
 const express = require("express");
 const app = express();
 const pool = require("./db");
-const verifyToken = require("./auth"); // middleware token
+const verifyToken = require("./auth");
 
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// Tes koneksi root
 app.get("/", (req, res) => {
   res.send("API Backend Kost is Running 🚆");
 });
@@ -25,7 +24,7 @@ app.get("/ambilkost", async (req, res) => {
   }
 });
 
-app.post("/kost", verifyToken, async (req, res) => {
+app.post("/addkost", verifyToken, async (req, res) => {
   try {
     const {
       nama_ruangan,
