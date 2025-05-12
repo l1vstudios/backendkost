@@ -25,10 +25,10 @@ app.get("/ambilkost", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
+  const { username, passwords } = req.body;
 
   try {
-    if (!username || !password) {
+    if (!username || !passwords) {
       return res
         .status(400)
         .json({ message: "Username dan password wajib diisi" });
@@ -36,7 +36,7 @@ app.post("/login", async (req, res) => {
 
     const [users] = await pool.query(
       "SELECT * FROM iniusers WHERE username = ? AND password = ?",
-      [username, password]
+      [username, passwords]
     );
 
     const user = users[0];
@@ -50,7 +50,7 @@ app.post("/login", async (req, res) => {
       user: {
         id: user.id,
         username: user.username,
-        nama: user.nama || null, // jika ada
+        nama: user.nama || null,
       },
     });
   } catch (error) {
