@@ -50,7 +50,7 @@ app.post("/login", async (req, res) => {
       user: {
         id: user.id,
         username: user.username,
-        type: user.type || null,
+        type: user.tipe_akun || null,
       },
     });
   } catch (error) {
