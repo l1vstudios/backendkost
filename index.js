@@ -35,7 +35,7 @@ app.post("/login", async (req, res) => {
     }
 
     const [users] = await pool.query(
-      "SELECT * FROM iniusers WHERE username = ? AND password = ?",
+      "SELECT * FROM iniusers WHERE username = ? AND passwords = ?",
       [username, passwords]
     );
 
