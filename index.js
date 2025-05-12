@@ -24,6 +24,41 @@ app.get("/ambilkost", async (req, res) => {
   }
 });
 
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ message: "Username dan password wajib diisi" });
+    }
+
+    const [users] = await pool.query(
+      "SELECT * FROM iniusers WHERE username = ? AND password = ?",
+      [username, password]
+    );
+
+    const user = users[0];
+
+    if (!user) {
+      return res.status(401).json({ message: "Username atau password salah" });
+    }
+
+    res.status(200).json({
+      message: "Login berhasil",
+      user: {
+        id: user.id,
+        username: user.username,
+        nama: user.nama || null, // jika ada
+      },
+    });
+  } catch (error) {
+    console.error("ERROR:", error);
+    res.status(500).json({ message: "Login gagal", error: error.message });
+  }
+});
+
 app.post("/addkost", verifyToken, async (req, res) => {
   try {
     const {
