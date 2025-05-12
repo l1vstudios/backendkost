@@ -12,20 +12,19 @@ app.get("/", (req, res) => {
   res.send("API Backend Kost is Running 🚆");
 });
 
-// Endpoint ambil semua kost
 app.get("/ambilkost", async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM kost ORDER BY id DESC");
-    res.status(200).json(rows);
+    res.status(200).json({ data: rows });
   } catch (error) {
     console.error("ERROR:", error);
-    res
-      .status(500)
-      .json({ message: "Gagal mengambil data kost", error: error.message });
+    res.status(500).json({
+      message: "Gagal mengambil data kost",
+      error: error.message,
+    });
   }
 });
 
-// Endpoint tambah kost
 app.post("/kost", verifyToken, async (req, res) => {
   try {
     const {
