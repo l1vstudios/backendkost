@@ -63,6 +63,7 @@ app.post("/create-payment", async (req, res) => {
 
     res.status(200).json({
       message: "Token Snap berhasil dibuat",
+      order_id: order_id,
       snapToken: transaction.token,
       redirectUrl: transaction.redirect_url,
     });
