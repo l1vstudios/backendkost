@@ -45,22 +45,29 @@ app.post("/create-payment", async (req, res) => {
   };
 
   try {
-    // 1. Buat transaksi Midtrans Snap
     const transaction = await snap.createTransaction(parameter);
 
-    // 2. Panggil API lokal untuk cek status pembayaran
+    // Cek status via API kamu sendiri
     const statusRes = await fetch(
       `https://backendkost-production.up.railway.app/check-payment-status/${order_id}`
     );
     const statusData = await statusRes.json();
 
+    // Validasi rawResponse
+    if (!statusData.rawResponse) {
+      return res.status(500).json({
+        message: "Gagal mendapatkan status transaksi dari Midtrans",
+        error: statusData.message || "rawResponse tidak tersedia",
+      });
+    }
+
     const raw = statusData.rawResponse;
 
-    // 3. Simpan ke database dengan informasi lengkap
+    // Simpan transaksi ke database
     await pool.query(
       `INSERT INTO trx_kost 
-      (order_id, users_id, gross_amount, status, nama_pelanggan, email, phone, payment_type, transaction_time, transaction_id, expiry_time) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (order_id, users_id, gross_amount, status, nama_pelanggan, email, phone, payment_type, transaction_time, transaction_id, expiry_time) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         order_id,
         users_id,
@@ -76,7 +83,6 @@ app.post("/create-payment", async (req, res) => {
       ]
     );
 
-    // 4. Kirim respons ke frontend
     res.status(200).json({
       message: "Token Snap berhasil dibuat",
       order_id: order_id,
@@ -95,6 +101,7 @@ app.post("/create-payment", async (req, res) => {
     });
   }
 });
+
 app.post("/midtrans-callback", async (req, res) => {
   const { transaction_status, order_id } = req.body;
   console.log("Midtrans callback payload:", req.body);
