@@ -101,6 +101,58 @@ app.post("/addkost", verifyToken, async (req, res) => {
   }
 });
 
+app.put("/editkost/:id", verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      nama_ruangan,
+      deskripsi,
+      fasilitas,
+      harga,
+      ukuran_kamar,
+      tipe,
+      gambar,
+    } = req.body;
+
+    if (!id || !nama_ruangan || !harga || !tipe) {
+      return res.status(400).json({ message: "Data wajib tidak lengkap" });
+    }
+
+    const [result] = await pool.query(
+      `UPDATE kost SET 
+        nama_ruangan = ?, 
+        deskripsi = ?, 
+        fasilitas = ?, 
+        harga = ?, 
+        ukuran_kamar = ?, 
+        tipe = ?, 
+        gambar = ? 
+      WHERE id = ?`,
+      [
+        nama_ruangan,
+        deskripsi || "",
+        JSON.stringify(fasilitas || []),
+        harga,
+        ukuran_kamar || "",
+        tipe,
+        JSON.stringify(gambar || []),
+        id,
+      ]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Kost tidak ditemukan" });
+    }
+
+    res.status(200).json({ message: "Kost berhasil diperbarui" });
+  } catch (error) {
+    console.error("ERROR:", error);
+    res
+      .status(500)
+      .json({ message: "Gagal memperbarui kost", error: error.message });
+  }
+});
+
 app.delete("/hapuskost/:id", verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
