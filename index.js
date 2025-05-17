@@ -45,31 +45,55 @@ app.post("/create-payment", async (req, res) => {
   };
 
   try {
+    // Buat transaksi di Midtrans, dapatkan token dan redirect_url
     const transaction = await snap.createTransaction(parameter);
 
-    // Simpan transaksi ke database
+    // Panggil API status transaksi untuk ambil detail lengkap
+    const statusResponse = await snap.transaction.status(order_id);
+
+    // Ambil data penting dari statusResponse
+    const {
+      payment_type,
+      transaction_time,
+      transaction_id,
+      expiry_time,
+      transaction_status,
+      fraud_status,
+    } = statusResponse;
+
+    // Simpan transaksi ke database lengkap dengan info yang diambil dari statusResponse
     await pool.query(
-      "INSERT INTO trx_kost (order_id, users_id, gross_amount, status, nama_pelanggan, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      `INSERT INTO trx_kost 
+      (order_id, users_id, gross_amount, status, nama_pelanggan, email, phone, payment_type, transaction_time, transaction_id, expiry_time, fraud_status) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         order_id,
         users_id,
         parseInt(gross_amount),
-        "pending",
+        transaction_status || "pending",
         nama_pelanggan,
         email,
         phone,
+        payment_type,
+        transaction_time,
+        transaction_id,
+        expiry_time,
+        fraud_status,
       ]
     );
 
+    // Kirim response ke client lengkap dengan detail transaksi
     res.status(200).json({
       message: "Token Snap berhasil dibuat",
       order_id: order_id,
       snapToken: transaction.token,
       redirectUrl: transaction.redirect_url,
-      payment_type: transaction.payment_type,
-      transaction_time: transaction.transaction_time,
-      transaction_id: transaction.transaction_id,
-      expiry_time: transaction.expiry_time,
+      payment_type,
+      transaction_time,
+      transaction_id,
+      expiry_time,
+      transaction_status,
+      fraud_status,
     });
   } catch (error) {
     console.error("MIDTRANS ERROR:", error);
