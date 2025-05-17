@@ -69,6 +69,7 @@ app.post("/create-payment", async (req, res) => {
 
 app.post("/midtrans-callback", async (req, res) => {
   const { transaction_status, order_id } = req.body;
+  console.log("Midtrans callback payload:", req.body);
 
   let status = "pending";
   if (transaction_status === "settlement" || transaction_status === "capture") {
