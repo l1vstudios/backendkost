@@ -4,8 +4,52 @@ const pool = require("./db");
 const verifyToken = require("./auth");
 
 const PORT = process.env.PORT || 3000;
+const midtransClient = require("midtrans-client");
 
+// Inisialisasi Snap Midtrans
+const snap = new midtransClient.Snap({
+  isProduction: false, // true untuk production
+  serverKey: "SB-Mid-server-rhTh_R3AjJgPLTYvpqHu5fCA",
+  clientKey: "SB-Mid-client-2bdQyiviek_b6r89",
+});
 app.use(express.json());
+
+app.post("/create-payment", verifyToken, async (req, res) => {
+  const { order_id, gross_amount, nama_pelanggan, email, phone } = req.body;
+
+  if (!order_id || !gross_amount || !nama_pelanggan || !email || !phone) {
+    return res.status(400).json({ message: "Data pembayaran belum lengkap" });
+  }
+
+  const parameter = {
+    transaction_details: {
+      order_id: order_id,
+      gross_amount: parseInt(gross_amount),
+    },
+    customer_details: {
+      first_name: nama_pelanggan,
+      email: email,
+      phone: phone,
+    },
+    credit_card: {
+      secure: true,
+    },
+  };
+
+  try {
+    const transaction = await snap.createTransaction(parameter);
+    res.status(200).json({
+      message: "Token Snap berhasil dibuat",
+      snapToken: transaction.token,
+      redirectUrl: transaction.redirect_url,
+    });
+  } catch (error) {
+    console.error("MIDTRANS ERROR:", error);
+    res
+      .status(500)
+      .json({ message: "Gagal membuat transaksi", error: error.message });
+  }
+});
 
 app.get("/", (req, res) => {
   res.send("API Backend Kost is Running 🚆");
