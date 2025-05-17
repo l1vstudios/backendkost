@@ -101,6 +101,31 @@ app.post("/addkost", verifyToken, async (req, res) => {
   }
 });
 
+app.delete("/hapuskost/:id", verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ message: "ID kost tidak ditemukan" });
+    }
+
+    const [result] = await pool.query(`DELETE FROM kost WHERE id = ?`, [id]);
+
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ message: "Kost tidak ditemukan atau sudah dihapus" });
+    }
+
+    res.status(200).json({ message: "Kost berhasil dihapus" });
+  } catch (error) {
+    console.error("ERROR:", error);
+    res
+      .status(500)
+      .json({ message: "Gagal menghapus kost", error: error.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
