@@ -48,7 +48,7 @@ app.post("/create-payment", async (req, res) => {
     const transaction = await snap.createTransaction(parameter);
 
     // Simpan transaksi ke database
-    await db.query(
+    await pool.query(
       "INSERT INTO trx_kost (order_id, users_id, gross_amount, status) VALUES (?, ?, ?, ?)",
       [order_id, users_id, parseInt(gross_amount), "pending"]
     );
