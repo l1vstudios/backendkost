@@ -83,7 +83,7 @@ app.post("/midtrans-callback", async (req, res) => {
   }
 
   try {
-    await db.query("UPDATE trx_kost SET status = ? WHERE order_id = ?", [
+    await pool.query("UPDATE trx_kost SET status = ? WHERE order_id = ?", [
       status,
       order_id,
     ]);
