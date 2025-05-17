@@ -47,51 +47,16 @@ app.post("/create-payment", async (req, res) => {
   try {
     const transaction = await snap.createTransaction(parameter);
 
-    // Cek status via API kamu sendiri
-    const statusRes = await fetch(
-      `https://backendkost-production.up.railway.app/check-payment-status/${order_id}`
-    );
-    const statusData = await statusRes.json();
-
-    // Validasi rawResponse
-    if (!statusData.rawResponse) {
-      return res.status(500).json({
-        message: "Gagal mendapatkan status transaksi dari Midtrans",
-        error: statusData.message || "rawResponse tidak tersedia",
-      });
-    }
-
-    const raw = statusData.rawResponse;
-
     // Simpan transaksi ke database
     await pool.query(
-      `INSERT INTO trx_kost 
-        (order_id, users_id, gross_amount, status, nama_pelanggan, email, phone, payment_type, transaction_time, transaction_id, expiry_time) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        order_id,
-        users_id,
-        parseInt(gross_amount),
-        "pending",
-        nama_pelanggan,
-        email,
-        phone,
-        raw.payment_type,
-        raw.transaction_time,
-        raw.transaction_id,
-        raw.expiry_time,
-      ]
+      "INSERT INTO trx_kost (order_id, users_id, gross_amount, status, first_name, email, phone) VALUES (?, ?, ?, ?)",
+      [order_id, users_id, parseInt(gross_amount), "pending"]
     );
 
     res.status(200).json({
       message: "Token Snap berhasil dibuat",
-      order_id: order_id,
       snapToken: transaction.token,
       redirectUrl: transaction.redirect_url,
-      payment_type: raw.payment_type,
-      transaction_time: raw.transaction_time,
-      transaction_id: raw.transaction_id,
-      expiry_time: raw.expiry_time,
     });
   } catch (error) {
     console.error("MIDTRANS ERROR:", error);
@@ -143,7 +108,7 @@ app.get("/check-payment-status/:order_id", async (req, res) => {
       message: "Status pembayaran berhasil didapatkan",
       status: statusResponse.transaction_status,
       fraudStatus: statusResponse.fraud_status,
-      rawResponse: statusResponse, // ← PASTIKAN INI ADA
+      rawResponse: statusResponse, // Optional, for debugging
     });
   } catch (error) {
     console.error("MIDTRANS STATUS ERROR:", error);
