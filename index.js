@@ -15,9 +15,17 @@ const snap = new midtransClient.Snap({
 app.use(express.json());
 
 app.post("/create-payment", async (req, res) => {
-  const { order_id, gross_amount, nama_pelanggan, email, phone } = req.body;
+  const { order_id, gross_amount, nama_pelanggan, email, phone, users_id } =
+    req.body;
 
-  if (!order_id || !gross_amount || !nama_pelanggan || !email || !phone) {
+  if (
+    !order_id ||
+    !gross_amount ||
+    !nama_pelanggan ||
+    !email ||
+    !phone ||
+    !users_id
+  ) {
     return res.status(400).json({ message: "Data pembayaran belum lengkap" });
   }
 
@@ -38,6 +46,13 @@ app.post("/create-payment", async (req, res) => {
 
   try {
     const transaction = await snap.createTransaction(parameter);
+
+    // Simpan transaksi ke database
+    await db.query(
+      "INSERT INTO trx_kost (order_id, users_id, gross_amount, status) VALUES (?, ?, ?, ?)",
+      [order_id, users_id, parseInt(gross_amount), "pending"]
+    );
+
     res.status(200).json({
       message: "Token Snap berhasil dibuat",
       snapToken: transaction.token,
@@ -49,6 +64,32 @@ app.post("/create-payment", async (req, res) => {
       message: "Gagal membuat transaksi",
       error: error.message,
     });
+  }
+});
+
+app.post("/midtrans-callback", async (req, res) => {
+  const { transaction_status, order_id } = req.body;
+
+  let status = "pending";
+  if (transaction_status === "settlement" || transaction_status === "capture") {
+    status = "success";
+  } else if (
+    transaction_status === "cancel" ||
+    transaction_status === "deny" ||
+    transaction_status === "expire"
+  ) {
+    status = "failed";
+  }
+
+  try {
+    await db.query("UPDATE trx_kost SET status = ? WHERE order_id = ?", [
+      status,
+      order_id,
+    ]);
+    res.status(200).json({ message: "Status transaksi diperbarui" });
+  } catch (err) {
+    console.error("Callback error:", err);
+    res.status(500).json({ message: "Gagal memperbarui status" });
   }
 });
 
