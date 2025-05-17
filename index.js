@@ -103,6 +103,28 @@ app.post("/midtrans-callback", async (req, res) => {
   }
 });
 
+app.get("/get-payment/:users_id", async (req, res) => {
+  const { users_id } = req.params;
+
+  try {
+    const [rows] = await pool.query(
+      "SELECT * FROM trx_kost WHERE users_id = ?",
+      [users_id]
+    );
+
+    res.status(200).json({
+      message: "Data pembayaran berhasil diambil",
+      data: rows,
+    });
+  } catch (error) {
+    console.error("GET PAYMENT ERROR:", error);
+    res.status(500).json({
+      message: "Gagal mengambil data pembayaran",
+      error: error.message,
+    });
+  }
+});
+
 app.get("/check-payment-status/:order_id", async (req, res) => {
   const { order_id } = req.params;
 
