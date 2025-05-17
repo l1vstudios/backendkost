@@ -49,8 +49,16 @@ app.post("/create-payment", async (req, res) => {
 
     // Simpan transaksi ke database
     await pool.query(
-      "INSERT INTO trx_kost (order_id, users_id, gross_amount, status, first_name, email, phone) VALUES (?, ?, ?, ?)",
-      [order_id, users_id, parseInt(gross_amount), "pending"]
+      "INSERT INTO trx_kost (order_id, users_id, gross_amount, status, nama_pelanggan, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [
+        order_id,
+        users_id,
+        parseInt(gross_amount),
+        "pending",
+        nama_pelanggan,
+        email,
+        phone,
+      ]
     );
 
     res.status(200).json({
