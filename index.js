@@ -52,6 +52,31 @@ app.post("/create-payment", async (req, res) => {
   }
 });
 
+app.get("/check-payment-status/:order_id", async (req, res) => {
+  const { order_id } = req.params;
+
+  if (!order_id) {
+    return res.status(400).json({ message: "Order ID diperlukan" });
+  }
+
+  try {
+    const statusResponse = await snap.transaction.status(order_id);
+
+    res.status(200).json({
+      message: "Status pembayaran berhasil didapatkan",
+      status: statusResponse.transaction_status,
+      fraudStatus: statusResponse.fraud_status,
+      rawResponse: statusResponse, // Optional, for debugging
+    });
+  } catch (error) {
+    console.error("MIDTRANS STATUS ERROR:", error);
+    res.status(500).json({
+      message: "Gagal mengambil status pembayaran",
+      error: error.message,
+    });
+  }
+});
+
 // app.post("/create-payment", verifyToken, async (req, res) => {
 //   const { order_id, gross_amount, nama_pelanggan, email, phone } = req.body;
 
