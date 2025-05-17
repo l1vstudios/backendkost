@@ -136,7 +136,7 @@ app.get("/check-payment-status/:order_id", async (req, res) => {
       message: "Status pembayaran berhasil didapatkan",
       status: statusResponse.transaction_status,
       fraudStatus: statusResponse.fraud_status,
-      rawResponse: statusResponse, // Optional, for debugging
+      rawResponse: statusResponse, // ← PASTIKAN INI ADA
     });
   } catch (error) {
     console.error("MIDTRANS STATUS ERROR:", error);
