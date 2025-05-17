@@ -66,6 +66,10 @@ app.post("/create-payment", async (req, res) => {
       order_id: order_id,
       snapToken: transaction.token,
       redirectUrl: transaction.redirect_url,
+      payment_type: transaction.payment_type,
+      transaction_time: transaction.transaction_time,
+      transaction_id: transaction.transaction_id,
+      expiry_time: transaction.expiry_time,
     });
   } catch (error) {
     console.error("MIDTRANS ERROR:", error);
