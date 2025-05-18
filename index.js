@@ -252,7 +252,7 @@ app.post("/trx-bulanankost", async (req, res) => {
     // Jika tidak ada, lanjutkan insert
     const query = `
       INSERT INTO trx_bulanankost 
-      (parent_id_kost, parent_id_users, harga, tanggal_masuk, tanggal_bayaran, parent_status_payment)
+      (parent_id_kost, parent_id_users, harga, tanggal_masuk, tanggal_bayaran, parent_status_payment, nama_kamar)
       VALUES (?, ?, ?, ?, ?, ?)
     `;
 
@@ -292,6 +292,7 @@ app.get("/pembayaran", async (req, res) => {
         tanggal_masuk,
         tanggal_bayaran,
         parent_status_payment
+    
       FROM trx_bulanankost
       WHERE parent_id_users = ?
     `;
