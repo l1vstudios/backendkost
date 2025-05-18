@@ -252,7 +252,7 @@ app.post("/trx-bulanankost", async (req, res) => {
       parent_status_payment,
     ];
 
-    await db.execute(query, values); // gunakan `db.query()` jika Anda pakai mysql/mysql2
+    await pool.execute(query, values); // gunakan `db.query()` jika Anda pakai mysql/mysql2
 
     res.status(201).json({ message: "Data berhasil ditambahkan." });
   } catch (err) {
