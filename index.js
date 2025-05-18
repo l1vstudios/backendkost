@@ -250,6 +250,33 @@ app.get("/ambilkost", async (req, res) => {
 //   }
 // });
 
+app.post("/register", (req, res) => {
+  const { username, passwords, email, phone } = req.body;
+  let { tipe_akun } = req.body;
+
+  if (!username || !passwords || !email || !phone) {
+    return res.status(400).json({ message: "Semua field wajib diisi" });
+  }
+
+  // default tipe_akun ke "user"
+  tipe_akun = tipe_akun || "user";
+
+  const sql = `INSERT INTO users (username, passwords, tipe_akun, email, phone) VALUES (?, ?, ?, ?, ?)`;
+  const values = [username, passwords, tipe_akun, email, phone];
+
+  pool.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Error inserting user:", err);
+      return res.status(500).json({ message: "Gagal mendaftar" });
+    }
+
+    res.status(201).json({
+      message: "Registrasi berhasil",
+      userId: result.insertId,
+    });
+  });
+});
+
 app.post("/login", async (req, res) => {
   const { username, passwords } = req.body;
 
