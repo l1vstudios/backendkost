@@ -215,6 +215,52 @@ app.get("/ambilkost", async (req, res) => {
   }
 });
 
+router.post("/trx-bulanan-kost", async (req, res) => {
+  const {
+    parent_id_kost,
+    parent_id_users,
+    harga,
+    tanggal_masuk,
+    tanggal_bayaran,
+    parent_status_payment,
+  } = req.body;
+
+  if (
+    !parent_id_kost ||
+    !parent_id_users ||
+    !harga ||
+    !tanggal_masuk ||
+    !tanggal_bayaran ||
+    !parent_status_payment
+  ) {
+    return res.status(400).json({ message: "Semua field harus diisi." });
+  }
+
+  try {
+    const query = `
+      INSERT INTO trx_bulanan_kost 
+      (parent_id_kost, parent_id_users, harga, tanggal_masuk, tanggal_bayaran, parent_status_payment)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      parent_id_kost,
+      parent_id_users,
+      harga,
+      tanggal_masuk,
+      tanggal_bayaran,
+      parent_status_payment,
+    ];
+
+    await db.execute(query, values); // gunakan `db.query()` jika Anda pakai mysql/mysql2
+
+    res.status(201).json({ message: "Data berhasil ditambahkan." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Gagal menyimpan data." });
+  }
+});
+
 // app.post("/login", async (req, res) => {
 //   const { username, passwords } = req.body;
 
