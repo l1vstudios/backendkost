@@ -255,7 +255,7 @@ app.post("/trx-bulanankost", async (req, res) => {
     const query = `
       INSERT INTO trx_bulanankost 
       (parent_id_kost, parent_id_users, harga, tanggal_masuk, tanggal_bayaran, parent_status_payment, nama_kamar)
-      VALUES (?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
