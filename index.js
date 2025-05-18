@@ -215,7 +215,7 @@ app.get("/ambilkost", async (req, res) => {
   }
 });
 
-router.post("/trx-bulanan-kost", async (req, res) => {
+router.post("/trx-bulanankost", async (req, res) => {
   const {
     parent_id_kost,
     parent_id_users,
@@ -238,7 +238,7 @@ router.post("/trx-bulanan-kost", async (req, res) => {
 
   try {
     const query = `
-      INSERT INTO trx_bulanan_kost 
+      INSERT INTO trx_bulanankost 
       (parent_id_kost, parent_id_users, harga, tanggal_masuk, tanggal_bayaran, parent_status_payment)
       VALUES (?, ?, ?, ?, ?, ?)
     `;
