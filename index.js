@@ -3,7 +3,7 @@ const app = express();
 const pool = require("./db");
 const verifyToken = require("./auth");
 const session = require("express-session");
-
+app.use(express.json());
 app.use(
   session({
     secret: "KOSTBILLING2026", // sebaiknya dari .env
