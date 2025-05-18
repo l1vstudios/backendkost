@@ -2,7 +2,18 @@ const express = require("express");
 const app = express();
 const pool = require("./db");
 const verifyToken = require("./auth");
+const session = require("express-session");
 
+app.use(
+  session({
+    secret: "KOSTBILLING2026", // sebaiknya dari .env
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 60 * 60 * 1000, // 1 jam
+    },
+  })
+);
 const PORT = process.env.PORT || 3000;
 const midtransClient = require("midtrans-client");
 
@@ -204,6 +215,41 @@ app.get("/ambilkost", async (req, res) => {
   }
 });
 
+// app.post("/login", async (req, res) => {
+//   const { username, passwords } = req.body;
+
+//   try {
+//     if (!username || !passwords) {
+//       return res
+//         .status(400)
+//         .json({ message: "Username dan password wajib diisi" });
+//     }
+
+//     const [users] = await pool.query(
+//       "SELECT * FROM iniusers WHERE username = ? AND passwords = ?",
+//       [username, passwords]
+//     );
+
+//     const user = users[0];
+
+//     if (!user) {
+//       return res.status(401).json({ message: "Username atau password salah" });
+//     }
+
+//     res.status(200).json({
+//       message: "Login berhasil",
+//       user: {
+//         id: user.id,
+//         username: user.username,
+//         type: user.tipe_akun || null,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("ERROR:", error);
+//     res.status(500).json({ message: "Login gagal", error: error.message });
+//   }
+// });
+
 app.post("/login", async (req, res) => {
   const { username, passwords } = req.body;
 
@@ -214,28 +260,72 @@ app.post("/login", async (req, res) => {
         .json({ message: "Username dan password wajib diisi" });
     }
 
-    const [users] = await pool.query(
+    const [iniusers] = await pool.query(
       "SELECT * FROM iniusers WHERE username = ? AND passwords = ?",
       [username, passwords]
     );
 
-    const user = users[0];
+    const user = iniusers[0];
 
     if (!user) {
       return res.status(401).json({ message: "Username atau password salah" });
     }
 
+    // Simpan user ke session
+    req.session.user = {
+      id: user.id,
+      username: user.username,
+      type: user.tipe_akun || null,
+    };
+
     res.status(200).json({
       message: "Login berhasil",
-      user: {
-        id: user.id,
-        username: user.username,
-        type: user.tipe_akun || null,
-      },
+      user: req.session.user,
     });
   } catch (error) {
     console.error("ERROR:", error);
     res.status(500).json({ message: "Login gagal", error: error.message });
+  }
+});
+
+app.post("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Logout error:", err);
+      return res.status(500).json({ message: "Gagal logout" });
+    }
+
+    res.clearCookie("connect.sid"); // default cookie name
+    res.json({ message: "Logout berhasil" });
+  });
+});
+
+app.get("/profile", async (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ message: "Belum login" });
+  }
+
+  try {
+    const [iniusers] = await pool.query(
+      "SELECT id, username, email, nama_lengkap, tipe_akun FROM iniusers WHERE id = ?",
+      [req.session.user.id]
+    );
+
+    const user = iniusers[0];
+
+    if (!user) {
+      return res.status(404).json({ message: "User tidak ditemukan" });
+    }
+
+    res.status(200).json({
+      message: "Profil pengguna",
+      user: user,
+    });
+  } catch (error) {
+    console.error("ERROR:", error);
+    res
+      .status(500)
+      .json({ message: "Gagal mengambil profil", error: error.message });
   }
 });
 
