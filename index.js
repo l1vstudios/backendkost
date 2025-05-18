@@ -223,6 +223,7 @@ app.post("/trx-bulanankost", async (req, res) => {
     tanggal_masuk,
     tanggal_bayaran,
     parent_status_payment,
+    nama_kamar,
   } = req.body;
 
   if (
@@ -231,7 +232,8 @@ app.post("/trx-bulanankost", async (req, res) => {
     !harga ||
     !tanggal_masuk ||
     !tanggal_bayaran ||
-    !parent_status_payment
+    !parent_status_payment ||
+    !nama_kamar
   ) {
     return res.status(400).json({ message: "Semua field harus diisi." });
   }
@@ -263,6 +265,7 @@ app.post("/trx-bulanankost", async (req, res) => {
       tanggal_masuk,
       tanggal_bayaran,
       parent_status_payment,
+      nama_kamar,
     ];
 
     await pool.execute(query, values);
