@@ -258,7 +258,7 @@ app.post("/register", (req, res) => {
     return res.status(400).json({ message: "Semua field wajib diisi" });
   }
 
-  // default tipe_akun ke "user"
+  // default tipe_akun ke "users"
   tipe_akun = tipe_akun || "user";
 
   const sql = `INSERT INTO iniusers (username, passwords, tipe_akun, email, phone) VALUES (?, ?, ?, ?, ?)`;
