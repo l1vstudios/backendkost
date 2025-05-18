@@ -277,7 +277,7 @@ app.post("/register", (req, res) => {
       return res.status(500).json({ message: "Gagal mendaftar" });
     }
 
-    res.status(201).json({
+    res.status(202).json({
       message: "Registrasi berhasil",
       userId: result.insertId,
     });
