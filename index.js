@@ -267,10 +267,7 @@ app.post("/register", (req, res) => {
 
   // Default tipe_akun ke 'user' kalau tidak ada
   tipe_akun = tipe_akun || "user";
-  res.status(202).json({
-    message: "Registrasi berhasil",
-    userId: result.insertId,
-  });
+  res.status(202).json({ message: "Register Berhasil." });
   const sql = `INSERT INTO iniusers (username, passwords, tipe_akun, email, phone) VALUES (?, ?, ?, ?, ?)`;
   const values = [username, passwords, tipe_akun, email, phone];
 
