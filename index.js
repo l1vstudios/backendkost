@@ -267,7 +267,10 @@ app.post("/register", (req, res) => {
 
   // Default tipe_akun ke 'user' kalau tidak ada
   tipe_akun = tipe_akun || "user";
-
+  res.status(202).json({
+    message: "Registrasi berhasil",
+    userId: result.insertId,
+  });
   const sql = `INSERT INTO iniusers (username, passwords, tipe_akun, email, phone) VALUES (?, ?, ?, ?, ?)`;
   const values = [username, passwords, tipe_akun, email, phone];
 
@@ -276,11 +279,6 @@ app.post("/register", (req, res) => {
       console.error("Error inserting user:", err);
       return res.status(500).json({ message: "Gagal mendaftar" });
     }
-
-    res.status(202).json({
-      message: "Registrasi berhasil",
-      userId: result.insertId,
-    });
   });
 });
 
