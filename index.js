@@ -258,22 +258,21 @@ app.post("/register", (req, res) => {
     return res.status(400).json({ message: "Semua field wajib diisi" });
   }
 
-  // default tipe_akun ke "users"
   tipe_akun = tipe_akun || "user";
+
+  // Kirim response duluan
+  res.status(202).json({ message: "Request diterima, sedang diproses." });
 
   const sql = `INSERT INTO iniusers (username, passwords, tipe_akun, email, phone) VALUES (?, ?, ?, ?, ?)`;
   const values = [username, passwords, tipe_akun, email, phone];
 
-  pool.query(sql, values, (err, result) => {
+  pool.query(sql, values, (err) => {
     if (err) {
-      console.error("Error inserting user:", err);
-      return res.status(500).json({ message: "Gagal mendaftar" });
+      console.error("Gagal insert user:", err);
+      // Tidak bisa kirim response lagi karena sudah dikirim
+    } else {
+      console.log("User berhasil ditambahkan.");
     }
-
-    res.status(201).json({
-      message: "Registrasi berhasil",
-      userId: result.insertId,
-    });
   });
 });
 
