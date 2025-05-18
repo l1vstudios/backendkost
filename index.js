@@ -289,15 +289,35 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error("Logout error:", err);
-      return res.status(500).json({ message: "Gagal logout" });
-    }
+  try {
+    // Hapus session pengguna
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Error destroying session:", err);
+        return res.status(500).json({
+          success: false,
+          message: "Gagal menghancurkan session",
+        });
+      }
 
-    res.clearCookie("connect.sid"); // default cookie name
-    res.json({ message: "Logout berhasil" });
-  });
+      // Hapus cookie session
+      res.clearCookie("connect.sid"); // Sesuaikan dengan nama cookie session Anda
+
+      // Jika menggunakan JWT, Anda mungkin perlu menambahkan token ke blacklist
+      // atau mengurangi waktu expired token di sisi client
+
+      return res.status(200).json({
+        success: true,
+        message: "Logout berhasil",
+      });
+    });
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat logout",
+    });
+  }
 });
 
 app.get("/profile", async (req, res) => {
