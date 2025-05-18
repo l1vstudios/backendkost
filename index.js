@@ -274,6 +274,40 @@ app.post("/trx-bulanankost", async (req, res) => {
   }
 });
 
+app.get("/pembayaran", async (req, res) => {
+  const { parent_id_users } = req.query;
+
+  if (!parent_id_users) {
+    return res
+      .status(400)
+      .json({ message: "Parameter 'parent_id_users' wajib diisi." });
+  }
+
+  try {
+    const query = `
+      SELECT 
+        parent_id_kost,
+        parent_id_users,
+        harga,
+        tanggal_masuk,
+        tanggal_bayaran,
+        parent_status_payment
+      FROM trx_bulanankost
+      WHERE parent_id_users = ?
+    `;
+
+    const [rows] = await pool.execute(query, [parent_id_users]);
+
+    res.status(200).json({
+      message: "Data berhasil diambil.",
+      data: rows,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Gagal mengambil data." });
+  }
+});
+
 // app.post("/login", async (req, res) => {
 //   const { username, passwords } = req.body;
 
