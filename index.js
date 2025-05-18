@@ -356,7 +356,7 @@ app.get("/profile", async (req, res) => {
 
   try {
     const [iniusers] = await pool.query(
-      "SELECT id, username, tipe_akun FROM iniusers WHERE id = ?",
+      "SELECT id, username, tipe_akun, email, phone FROM iniusers WHERE id = ?",
       [req.session.user.id]
     );
 
