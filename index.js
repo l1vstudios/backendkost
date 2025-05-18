@@ -261,7 +261,7 @@ app.post("/register", (req, res) => {
   // default tipe_akun ke "user"
   tipe_akun = tipe_akun || "user";
 
-  const sql = `INSERT INTO users (username, passwords, tipe_akun, email, phone) VALUES (?, ?, ?, ?, ?)`;
+  const sql = `INSERT INTO iniusers (username, passwords, tipe_akun, email, phone) VALUES (?, ?, ?, ?, ?)`;
   const values = [username, passwords, tipe_akun, email, phone];
 
   pool.query(sql, values, (err, result) => {
