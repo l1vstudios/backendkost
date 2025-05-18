@@ -237,6 +237,19 @@ app.post("/trx-bulanankost", async (req, res) => {
   }
 
   try {
+    // Cek apakah data dengan parent_id_kost dan parent_id_users sudah ada
+    const [existing] = await pool.execute(
+      "SELECT * FROM trx_bulanankost WHERE parent_id_kost = ? AND parent_id_users = ?",
+      [parent_id_kost, parent_id_users]
+    );
+
+    if (existing.length > 0) {
+      return res.status(409).json({
+        message: "Maaf Kos Sudah Terbooking User Lain.",
+      });
+    }
+
+    // Jika tidak ada, lanjutkan insert
     const query = `
       INSERT INTO trx_bulanankost 
       (parent_id_kost, parent_id_users, harga, tanggal_masuk, tanggal_bayaran, parent_status_payment)
@@ -252,7 +265,7 @@ app.post("/trx-bulanankost", async (req, res) => {
       parent_status_payment,
     ];
 
-    await pool.execute(query, values); // gunakan `db.query()` jika Anda pakai mysql/mysql2
+    await pool.execute(query, values);
 
     res.status(201).json({ message: "Data berhasil ditambahkan." });
   } catch (err) {
