@@ -258,6 +258,14 @@ app.post("/register", (req, res) => {
     return res.status(400).json({ message: "Semua field wajib diisi" });
   }
 
+  // Jika tipe_akun dikirim dan isinya 'admin', tolak request
+  if (tipe_akun && tipe_akun.toLowerCase() === "admin") {
+    return res
+      .status(403)
+      .json({ message: "Registrasi sebagai admin tidak diperbolehkan" });
+  }
+
+  // Default tipe_akun ke 'user' kalau tidak ada
   tipe_akun = tipe_akun || "user";
 
   const sql = `INSERT INTO iniusers (username, passwords, tipe_akun, email, phone) VALUES (?, ?, ?, ?, ?)`;
