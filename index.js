@@ -294,7 +294,8 @@ app.get("/pembayaran", async (req, res) => {
         harga,
         tanggal_masuk,
         tanggal_bayaran,
-        parent_status_payment
+        parent_status_payment,
+        nama_kamar
     
       FROM trx_bulanankost
       WHERE parent_id_users = ?
