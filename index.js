@@ -215,7 +215,7 @@ app.get("/ambilkost", async (req, res) => {
   }
 });
 
-router.post("/trx-bulanankost", async (req, res) => {
+app.post("/trx-bulanankost", async (req, res) => {
   const {
     parent_id_kost,
     parent_id_users,
