@@ -277,6 +277,33 @@ app.post("/trx-bulanankost", async (req, res) => {
   }
 });
 
+app.post("/api/game-feature", async (req, res) => {
+  const payload = {
+    key: "Q2xMSjNiz4fx59vyYR7DBWaC2xAsWAqCRHPIPpjw0prKf7RclOLXcvMZ4Nav2SwR",
+    sign: "550f32ea4f8d5b0eeaa387a182342d35",
+    type: "services",
+    filter_type: "game",
+  };
+
+  try {
+    // cloudscraper.post mengirim data sebagai form-urlencoded
+    const response = await cloudscraper.post(
+      "https://vip-reseller.co.id/api/game-feature",
+      {
+        form: payload,
+      }
+    );
+
+    // response sudah berupa string, parse JSON
+    const data = JSON.parse(response);
+    res.json(data);
+  } catch (error) {
+    res
+      .status(error.statusCode || 500)
+      .json({ message: error.message, error: error });
+  }
+});
+
 app.get("/pembayaran", async (req, res) => {
   const { parent_id_users } = req.query;
 
