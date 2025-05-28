@@ -286,21 +286,21 @@ app.post("/api/game-feature", async (req, res) => {
   };
 
   try {
-    // cloudscraper.post mengirim data sebagai form-urlencoded
     const response = await fetch(
       "https://vip-reseller.co.id/api/game-feature",
       {
-        form: payload,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: qs.stringify(payload), // encode payload jadi form-urlencoded
       }
     );
 
-    // response sudah berupa string, parse JSON
-    const data = JSON.parse(response);
+    const data = await response.json(); // langsung parse json dari response
     res.json(data);
   } catch (error) {
-    res
-      .status(error.statusCode || 500)
-      .json({ message: error.message, error: error });
+    res.status(500).json({ message: error.message, error });
   }
 });
 
