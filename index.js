@@ -287,7 +287,7 @@ app.post("/api/game-feature", async (req, res) => {
 
   try {
     // cloudscraper.post mengirim data sebagai form-urlencoded
-    const response = await cloudscraper.post(
+    const response = await fetch(
       "https://vip-reseller.co.id/api/game-feature",
       {
         form: payload,
