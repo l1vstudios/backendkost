@@ -286,18 +286,18 @@ app.post("/api/game-feature", async (req, res) => {
   };
 
   try {
+    const params = new URLSearchParams(payload);
+
     const response = await fetch(
       "https://vip-reseller.co.id/api/game-feature",
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: qs.stringify(payload), // encode payload jadi form-urlencoded
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString(), // ini encode jadi form-urlencoded
       }
     );
 
-    const data = await response.json(); // langsung parse json dari response
+    const data = await response.json();
     res.json(data);
   } catch (error) {
     res.status(500).json({ message: error.message, error });
