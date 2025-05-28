@@ -302,13 +302,27 @@ app.post("/api/game-feature", async (req, res) => {
       "https://vip-reseller.co.id/api/game-feature",
       {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: params.toString(), // ini encode jadi form-urlencoded
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+            "(KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+        },
+        body: params.toString(),
       }
     );
 
-    const data = await response.json();
-    res.json(data);
+    const text = await response.text();
+
+    try {
+      const data = JSON.parse(text);
+      res.json(data);
+    } catch (err) {
+      // Kalau gagal parse JSON, kirim text-nya untuk debugging
+      res
+        .status(500)
+        .json({ message: "Response bukan JSON", rawResponse: text });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message, error });
   }
