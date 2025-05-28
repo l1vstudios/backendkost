@@ -277,6 +277,16 @@ app.post("/trx-bulanankost", async (req, res) => {
   }
 });
 
+app.get("/my-ip", async (req, res) => {
+  try {
+    const response = await fetch("https://api.ipify.org?format=json");
+    const data = await response.json();
+    res.json({ ip: data.ip });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post("/api/game-feature", async (req, res) => {
   const payload = {
     key: "Q2xMSjNiz4fx59vyYR7DBWaC2xAsWAqCRHPIPpjw0prKf7RclOLXcvMZ4Nav2SwR",
